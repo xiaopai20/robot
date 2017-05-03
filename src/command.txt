@@ -1,4 +1,4 @@
-docker run -v /c/Users/Hannah/Desktop/xiaopai:/tf -it tensorflow/tensorflow bash
+docker run -v /c/Users/Hannah/Desktop/xiaopai:/tf -p 8080:8080 -it tensorflow/tensorflow bash
 
 
 python tensorflow/tensorflow/examples/image_retraining/retrain.py --image_dir=/tf/training/ --bottleneck_dir=/tf/bottleneck --how_many_training_steps 500 --model_dir=/tf/inception --output_graph=/tf/training/retrained_graph.pb output_labels=/tf/training/retrained_labels.txt
