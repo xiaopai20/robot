@@ -10,10 +10,10 @@ body {
 </style>
 
 </header>
-<script type="text/javascript" language="javascript">
+<script>
 
-var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/speak.py';
-var resultPath = "C:/Users/Hannah/Desktop/xiaopai/images/current/result.txt";
+var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/src/speak.py';
+var resultPage = "getPersonName";
 
 var nameMap = {
   'xiaopai': 'xiao pai',
@@ -23,24 +23,48 @@ var nameMap = {
 
 function speak(text) {
    w = new ActiveXObject("WScript.Shell");
-   w.run(speakerCommand + " \"" + text + "\"", 0);
+   w.run(speakerCommand + " \"" + text + "\"", 0, true);
 }
 
 function getResult() {
-   try {
-     var fso, ts,s;
-     fso = new ActiveXObject("Scripting.FileSystemObject");
-     f1 = fso.OpenTextFile(resultPath, 1);
-     return f1.ReadLine();
-   } catch(err) {
-      return "Unknown";
-   }
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", resultPage, true);
+  xmlhttp.timeout = 1000;
+  xmlhttp.send();
+  return xmlhttp.responseText;
+}
+
+function addLog(text) {
+    curLog = document.getElementById("log").innerHTML;
+    document.getElementById("log").innerHTML = text + "<BR>" + curLog;
+}
+
+function run() {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", resultPage, true);
+    xmlhttp.timeout = 3000;
+
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            if (this.status == 200)
+                processResult(this.responseText);
+            else if (this.status != 0)
+                addLog("http response error");
+        }
+    };
+    xmlhttp.ontimeout = function () {
+        addLog("http request timeout");
+        setTimeout(run, 100);
+    }
+    xmlhttp.send();
 }
 
 var previousResult = "";
-function run() {
-    result = getResult();
-    if (nameMap[result] === undefined) {
+function processResult(result) {
+    addLog("process " + result);
+
+    if (nameMap[result] == undefined) {
         setTimeout(run, 100);
         return;
     }
@@ -64,12 +88,14 @@ function run() {
 }
 
 alert("start");
-
 </script>
 <body onload="run()">
 <br><br><br><br><br>
 <div><font id="speak" size=22 color="#FFFFFF">Hello</font></div>
 <br><br><br>
 <img id="robotImg" src="robotStand.png" width=300/>
+
+<br>
+<font id="log" color="#888888"></font>
 </body>
 </html>
