@@ -1,0 +1,75 @@
+<html>
+<header>
+<title>Robort</title>
+
+<style>
+body {
+    background-color:#000000;
+    text-align: center;
+}
+</style>
+
+</header>
+<script type="text/javascript" language="javascript">
+
+var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/speak.py';
+var resultPath = "C:/Users/Hannah/Desktop/xiaopai/images/current/result.txt";
+
+var nameMap = {
+  'xiaopai': 'xiao pai',
+  'lixue': 'li xue',
+  'room': 'nobody'
+}
+
+function speak(text) {
+   w = new ActiveXObject("WScript.Shell");
+   w.run(speakerCommand + " \"" + text + "\"", 0);
+}
+
+function getResult() {
+   try {
+     var fso, ts,s;
+     fso = new ActiveXObject("Scripting.FileSystemObject");
+     f1 = fso.OpenTextFile(resultPath, 1);
+     return f1.ReadLine();
+   } catch(err) {
+      return "Unknown";
+   }
+}
+
+var previousResult = "";
+function run() {
+    result = getResult();
+    if (nameMap[result] === undefined) {
+        setTimeout(run, 100);
+        return;
+    }
+    if (result == previousResult) {
+        setTimeout(run, 200);
+        return;
+    }
+    var speakText = "";
+    if (nameMap[result] != "nobody") {
+        document.getElementById("robotImg").src="robotHello.png";
+        speakText = "Hello " + nameMap[result];
+    }
+    else {
+        document.getElementById("robotImg").src="robotStand.png";
+        speakText = "Goodbye " + nameMap[previousResult];
+    }
+    document.getElementById("speak").innerText=speakText;
+    speak(speakText);
+    previousResult = result;
+    setTimeout(run, 200);
+}
+
+alert("start");
+
+</script>
+<body onload="run()">
+<br><br><br><br><br>
+<div><font id="speak" size=22 color="#FFFFFF">Hello</font></div>
+<br><br><br>
+<img id="robotImg" src="robotStand.png" width=300/>
+</body>
+</html>
