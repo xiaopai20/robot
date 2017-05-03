@@ -3,13 +3,16 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import tensorflow as tf, sys
 
 PORT_NUMBER = 8080
+IMAGE_ROOT = "/tf/share_data/"
+RETRAINED_TXT = "/tf/training/retrained_labels.txt"
+RETRAINED_GRAPH = "/tf/training/retrained_graph.pb"
 
 # Loads label file, strips off carriage return
 label_lines = [line.rstrip() for line 
-                   in tf.gfile.GFile("/tf/training/retrained_labels.txt")]
+                   in tf.gfile.GFile(RETRAINED_TXT)]
 
 # Unpersists graph from file
-with tf.gfile.FastGFile("/tf/training/retrained_graph.pb", 'rb') as f:
+with tf.gfile.FastGFile(RETRAINED_GRAPH, 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
     _ = tf.import_graph_def(graph_def, name='')
@@ -28,7 +31,7 @@ class myHandler(BaseHTTPRequestHandler):
 		self.send_header('Content-type','text/html')
 		self.end_headers()
 
-                image_path = "/tf/test/" + self.path;
+                image_path = IMAGE_ROOT + self.path;
                 print(self.path)
                 image_data = tf.gfile.FastGFile(image_path, 'rb').read()
                 predictions = sess.run(softmax_tensor, \
