@@ -5,6 +5,7 @@
 <style>
 body {
     background-color:#000000;
+    overflow:hidden;
     text-align: center;
 }
 </style>
@@ -13,7 +14,7 @@ body {
 <script>
 
 var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/src/speak.py';
-var resultPage = "getPersonName";
+var resultPage = "get";
 
 var nameMap = {
   'xiaopai': 'xiao pai',
@@ -21,7 +22,12 @@ var nameMap = {
   'room': 'nobody'
 }
 
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(find, 'g'), replace);
+}
+
 function speak(text) {
+   document.getElementById("speak").innerText=text;
    w = new ActiveXObject("WScript.Shell");
    w.run(speakerCommand + " \"" + text + "\"", 0, true);
 }
@@ -60,42 +66,95 @@ function run() {
     xmlhttp.send();
 }
 
-var previousResult = "";
-function processResult(result) {
-    addLog("process " + result);
-
-    if (nameMap[result] == undefined) {
-        setTimeout(run, 100);
+var previousPerson = "";
+function processPerson(name) {
+    if (previousPerson == name)
         return;
-    }
-    if (result == previousResult) {
-        setTimeout(run, 200);
-        return;
-    }
     var speakText = "";
-    if (nameMap[result] != "nobody") {
+    if (nameMap[name] != "nobody") {
         document.getElementById("robotImg").src="robotHello.png";
-        speakText = "Hello " + nameMap[result];
+        speakText = "Hello " + nameMap[name];
     }
     else {
         document.getElementById("robotImg").src="robotStand.png";
-        speakText = "Goodbye " + nameMap[previousResult];
+        speakText = "Goodbye " + nameMap[previousPerson];
     }
-    document.getElementById("speak").innerText=speakText;
     speak(speakText);
-    previousResult = result;
+    previousPerson = name;
+}
+
+var perviousItem = "";
+var previousPrediction = 0;
+function processItem(itemStr) {
+    var obj = JSON.parse(itemStr);
+
+    var jsonHtml = JSON.stringify(obj, null, 2);
+    jsonHtml = replaceAll(jsonHtml, "\n", "<BR>");
+    jsonHtml = replaceAll(jsonHtml, " ", "&nbsp;");
+    document.getElementById("itemPrediction").innerHTML = jsonHtml;
+
+    name = obj[0].name.split(",")[0];
+    prediction = obj[0].prediction;
+
+    if (prediction < 30)
+        return;
+
+    if (name == perviousItem && prediction - previousPrediction < 20)
+        return;
+    var speakText = "";
+    if (prediction > 90)
+        speakText = "It definitely is " + name;
+    else if (prediction > 70)
+        speakText = "I am pretty sure it is " + name;
+    else if (prediction > 50)
+        speakText = "Looks like it is " + name;
+    else
+        speakText = "Perhaps it is " + name;
+    speak(speakText);
+    perviousItem = name;
+    previousPrediction = prediction;
+}
+
+function processResult(result) {
+    addLog("process " + result);
+
+    var obj = JSON.parse(result);
+
+    document.getElementById("camera").src = "/share_data/" + obj.image;
+
+    if (nameMap[obj.person] == undefined) {
+        processItem(obj.item);
+        setTimeout(run, 100);
+        return;
+    }
+    processPerson(obj.person);
+    processItem(obj.item);
     setTimeout(run, 200);
 }
 
 alert("start");
 </script>
 <body onload="run()">
-<br><br><br><br><br>
+<br><br><br>
 <div><font id="speak" size=22 color="#FFFFFF">Hello</font></div>
 <br><br><br>
-<img id="robotImg" src="robotStand.png" width=300/>
+<table cellpadding="0" cellspacing="0" width="1200" align="center">
+    <tr>
+        <td width="450" align="left" valign="bottom">
+            <img id="camera" src="" width="250">
+        </td>
+        <td width="300">
+            <img id="robotImg" src="robotStand.png" width=300/>
+        </td>
+        <td width="450" valign="bottom">
+            <font id="itemPrediction" color="#555555"
+                  style="display: inline-block; width:400px;"></font>
+        </td>
+    </tr>
+</table>
+
 
 <br>
-<font id="log" color="#888888"></font>
+<font id="log" color="#555544"></font>
 </body>
 </html>
