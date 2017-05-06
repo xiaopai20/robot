@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import tensorflow as tf, sys
+import time
 
 PORT_NUMBER = 8088
 IMAGE_ROOT = "/tf/share_data/"
@@ -26,6 +27,7 @@ class myHandler(BaseHTTPRequestHandler):
     #Handler for the GET requests
     def do_GET(self):
         print "receive: " + self.path
+        startTime = time.time()
         if self.path.endswith(".ico"):
             return
         self.send_response(200)
@@ -48,6 +50,7 @@ class myHandler(BaseHTTPRequestHandler):
         if predictions[0][top_k[0]] > 0.5:
            self.wfile.write(label_lines[top_k[0]])
 
+        print "delay: " + str(time.time() - startTime) + " " + label_lines[top_k[0]]
 
 try:
     #Create a web server and define the handler to manage the

@@ -4,6 +4,7 @@ import tensorflow as tf
 import os.path
 import re
 import json
+import time
 
 PORT_NUMBER = 8089
 IMAGE_ROOT = "/tf/share_data/"
@@ -90,6 +91,7 @@ class myHandler(BaseHTTPRequestHandler):
     #Handler for the GET requests
     def do_GET(self):
         print "receive: " + self.path
+        startTime = time.time()
         if self.path.endswith(".ico"):
             return
         self.send_response(200)
@@ -115,6 +117,7 @@ class myHandler(BaseHTTPRequestHandler):
 
         self.wfile.write(json.dumps(ret))
 
+        print "delay: " + str(time.time() - startTime)
 
 try:
     #Create a web server and define the handler to manage the

@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <header>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 <title>Robort</title>
 
 <style>
@@ -11,7 +13,8 @@ body {
 </style>
 
 </header>
-<script>
+
+<script type="text/javascript">
 
 var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/src/speak.py';
 var resultPage = "get";
@@ -32,6 +35,11 @@ function speak(text) {
    w.run(speakerCommand + " \"" + text + "\"", 0, true);
 }
 
+function searchImage(text) {
+   var iframe = document.getElementById("imageSearchFrame");
+   iframe.src = "http://www.bing.com/images/search?q=" + text;
+}
+
 function getResult() {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", resultPage, true);
@@ -42,6 +50,8 @@ function getResult() {
 
 function addLog(text) {
     curLog = document.getElementById("log").innerHTML;
+    if (curLog.length > 1000)
+        curLog = curLog.substring(0, 1000);
     document.getElementById("log").innerHTML = text + "<BR>" + curLog;
 }
 
@@ -110,6 +120,7 @@ function processItem(itemStr) {
         speakText = "Looks like it is " + name;
     else
         speakText = "Perhaps it is " + name;
+    searchImage(name);
     speak(speakText);
     perviousItem = name;
     previousPrediction = prediction;
@@ -120,7 +131,7 @@ function processResult(result) {
 
     var obj = JSON.parse(result);
 
-    document.getElementById("camera").src = "/share_data/" + obj.image;
+    document.getElementById("camera").src = "/share_data/" + obj.image + "?" + Math.random();
 
     if (nameMap[obj.person] == undefined) {
         processItem(obj.item);
@@ -140,13 +151,31 @@ alert("start");
 <br><br><br>
 <table cellpadding="0" cellspacing="0" width="1200" align="center">
     <tr>
-        <td width="450" align="left" valign="bottom">
-            <img id="camera" src="" width="250">
+        <td width="450" align="left" valign="top">
+            <div style="position: fixed; top:200; left:0;">
+                <iframe id="imageSearchFrame" src="" height=400 width=450
+                        frameborder=0 marginheight=0 marginwidth=0 scrolling="no" style="filter:alpha(opacity=50)" >
+                </iframe>
+            </div>
+            <div id="topCover" style="position: fixed; top:200; left:0;">
+                <img src="black.jpg" width="450" height="200" />
+            </div>
+            <div id="opacity" style="position: fixed; top:200; left:0;">
+                <img src="opacity.png" width="450" height="400" />
+            </div>
+            <div style="position: fixed; top:200; left:0;">
+                <table width="450" cellspacing="0" cellpadding="0">
+                    <tr><td align="center">
+                        <img id="camera" src="" width="250">
+                    </td></tr>
+                </table>
+            </div>
+
         </td>
         <td width="300">
             <img id="robotImg" src="robotStand.png" width=300/>
         </td>
-        <td width="450" valign="bottom">
+        <td width="450" valign="bottom" align="left">
             <font id="itemPrediction" color="#555555"
                   style="display: inline-block; width:400px;"></font>
         </td>

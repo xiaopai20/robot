@@ -4,6 +4,7 @@ from multiprocessing.pool import ThreadPool
 import cv2
 import urllib2
 import json
+import time
 
 PORT_NUMBER = 8080
 IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data\\"
@@ -24,6 +25,7 @@ class myHandler(SimpleHTTPRequestHandler):
 
 	#Handler for the GET requests
 	def do_GET(self):
+		startTime = time.time()
 		print "received " + self.path
 		if not self.path.endswith("get"):
 			return SimpleHTTPRequestHandler.do_GET(self)
@@ -53,13 +55,19 @@ class myHandler(SimpleHTTPRequestHandler):
 			print "saving " + imgFileName + " error"
 		print "save " + imgFileName
 
-		personAsyncCall = pool.apply_async(callUrl, (HUMAN_RECOGNIZE_SERVICE_URL + imgFileName,))
-		itemAsyncCall = pool.apply_async(callUrl, (BASIC_RECOGNIZE_SERVICE_URL + imgFileName,))
+		# personAsyncCall = pool.apply_async(callUrl, (HUMAN_RECOGNIZE_SERVICE_URL + imgFileName,))
+		# itemAsyncCall = pool.apply_async(callUrl, (BASIC_RECOGNIZE_SERVICE_URL + imgFileName,))
+        #
+		# personName = personAsyncCall.get(1000)
+		# itemName = itemAsyncCall.get(1000)
 
-		personName = personAsyncCall.get(1000)
-		itemName = itemAsyncCall.get(1000)
+		personName = callUrl(HUMAN_RECOGNIZE_SERVICE_URL + imgFileName)
+		itemName = callUrl(BASIC_RECOGNIZE_SERVICE_URL + imgFileName)
 
-		ret = {'image' : imgFileName, 'person' : personName, 'item' : itemName}
+		ret = {'image' : imgFileName,
+			   'person' : personName,
+			   'item' : itemName,
+			   'delay' : int(1000 * (time.time() - startTime))}
 		print ret
 		self.wfile.write(json.dumps(ret))
 
