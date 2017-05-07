@@ -1,18 +1,18 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from multiprocessing.pool import ThreadPool
-import cv2
 import urllib2
 import json
 import time
+import cgi
+
 
 PORT_NUMBER = 8080
-IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data\\"
-HUMAN_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8088/"
-BASIC_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8089/"
+IMG_PATH = "/Users/pguoping/tensorflow/share_data/"
+HUMAN_RECOGNIZE_SERVICE_URL = "http://localhost:8088/"
+BASIC_RECOGNIZE_SERVICE_URL = "http://localhost:8089/"
 
 pool = ThreadPool(processes=2)
-cap = cv2.VideoCapture(0)
 curImgIndex = 0
 
 
@@ -25,41 +25,42 @@ class myHandler(SimpleHTTPRequestHandler):
 
 	#Handler for the GET requests
 	def do_GET(self):
+		return SimpleHTTPRequestHandler.do_GET(self)
+
+	def do_POST(self):
 		startTime = time.time()
 		print "received " + self.path
-		if not self.path.endswith("get"):
+		if not self.path.endswith("parse"):
 			return SimpleHTTPRequestHandler.do_GET(self)
 
 		self.send_response(200)
-		self.send_header('cache-control','max-age=0')
-		self.send_header('cache-control','no-cache')
 		self.send_header('Content-type','text/html')
 		self.end_headers()
 
-		# double read to capture latest pic,
-		# other wise it will return last 2nd one, don't know why...
-		cap.read()
-		ret, img = cap.read()
-		if not ret:
-			self.wfile.write("Capture image error")
-			return
-
-		#cv2.imshow("input", img)
 		global curImgIndex
 		curImgIndex += 1
 		curImgIndex %= 100
 
 		imgFileName = str(curImgIndex) + ".jpg"
-		wRet = cv2.imwrite(IMG_PATH + imgFileName, img)
-		if not wRet:
-			print "saving " + imgFileName + " error"
-		print "save " + imgFileName
 
-		# personAsyncCall = pool.apply_async(callUrl, (HUMAN_RECOGNIZE_SERVICE_URL + imgFileName,))
-		# itemAsyncCall = pool.apply_async(callUrl, (BASIC_RECOGNIZE_SERVICE_URL + imgFileName,))
-        #
-		# personName = personAsyncCall.get(1000)
-		# itemName = itemAsyncCall.get(1000)
+		form = cgi.FieldStorage(
+			fp=self.rfile,
+			headers=self.headers,
+			environ={'REQUEST_METHOD':'POST',
+					 'CONTENT_TYPE':self.headers['Content-Type'],
+					 })
+		filename = form['file'].filename
+		file_content = form['file'].file.read()
+
+		with open(IMG_PATH + imgFileName, 'wb') as fh:
+			fh.write(file_content)
+			print "write file " + imgFileName
+
+		#personAsyncCall = pool.apply_async(callUrl, (HUMAN_RECOGNIZE_SERVICE_URL + imgFileName,))
+		#itemAsyncCall = pool.apply_async(callUrl, (BASIC_RECOGNIZE_SERVICE_URL + imgFileName,))
+
+		#personName = personAsyncCall.get(1000)
+		#itemName = itemAsyncCall.get(1000)
 
 		personName = callUrl(HUMAN_RECOGNIZE_SERVICE_URL + imgFileName)
 		itemName = callUrl(BASIC_RECOGNIZE_SERVICE_URL + imgFileName)
