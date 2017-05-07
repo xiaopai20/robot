@@ -8,9 +8,9 @@ import requests
 import pyttsx
 
 
-PORT_NUMBER = 8085
+PORT_NUMBER = 8080
 IMG_PATH = "C:\\robot\\capture\\"
-SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8080/parse"
+SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8081/parse"
 
 cap = cv2.VideoCapture(0)
 curImgIndex = 0
