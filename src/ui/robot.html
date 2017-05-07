@@ -30,6 +30,7 @@ function replaceAll(str, find, replace) {
 }
 
 function speak(text) {
+  document.getElementById("speak").innerHTML = text;
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", "/speak?" + text, true);
   xmlhttp.send();
