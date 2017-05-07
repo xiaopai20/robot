@@ -3,13 +3,12 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 from multiprocessing.pool import ThreadPool
 import cv2
 import urllib2
-import json
 import time
 import requests
 import pyttsx
 
 
-PORT_NUMBER = 8080
+PORT_NUMBER = 8085
 IMG_PATH = "C:\\robot\\capture\\"
 SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8080/parse"
 
@@ -29,7 +28,9 @@ def callUrl(url):
 class myHandler(SimpleHTTPRequestHandler):
 
 	def speak(self):
-		engine.say(self.path.split("?")[1])
+		text = urllib2.unquote(self.path.split("?")[1])
+		print "speak " + text
+		engine.say(text)
 		engine.runAndWait()
 
 	#Handler for the GET requests
