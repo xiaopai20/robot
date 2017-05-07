@@ -36,6 +36,7 @@ class myHandler(SimpleHTTPRequestHandler):
 	def do_GET(self):
 		if self.path.startswith("/speak"):
 			self.speak()
+			return
 
 		if not self.path.endswith("get"):
 			return SimpleHTTPRequestHandler.do_GET(self)

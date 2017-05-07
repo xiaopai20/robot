@@ -17,7 +17,7 @@ body {
 <script type="text/javascript">
 
 var speakerCommand = 'C:/Python27/python.exe C:/Users/Hannah/Desktop/xiaopai/src/speak.py';
-var resultPage = "get";
+var resultPage = "/get";
 
 var nameMap = {
   'xiaopai': 'xiao pai',
@@ -31,21 +31,13 @@ function replaceAll(str, find, replace) {
 
 function speak(text) {
   var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET", "speak?" + text, true);
+  xmlhttp.open("GET", "/speak?" + text, true);
   xmlhttp.send();
 }
 
 function searchImage(text) {
    var iframe = document.getElementById("imageSearchFrame");
    iframe.src = "http://www.bing.com/images/search?q=" + text;
-}
-
-function getResult() {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET", resultPage, true);
-  xmlhttp.timeout = 1000;
-  xmlhttp.send();
-  return xmlhttp.responseText;
 }
 
 function addLog(text) {

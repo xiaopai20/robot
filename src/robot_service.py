@@ -9,16 +9,19 @@ import cgi
 
 PORT_NUMBER = 8080
 # IMG_PATH = "/Users/pguoping/tensorflow/share_data/"
-IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data";
+IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data"
 HUMAN_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8088/"
 BASIC_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8089/"
+
+CAMERA_CALLBACK_URL = "http://192.168.1.147:8080/get"
+SPEAK_CALLBACK_URL = "http://192.168.1.147:8080/speak?"
 
 pool = ThreadPool(processes=2)
 curImgIndex = 0
 
 
 def callUrl(url):
-	return urllib2.urlopen(url, timeout=1000).read()
+	return urllib2.urlopen(url, timeout=3000).read()
 
 #This class will handles any incoming request from
 #the browser
@@ -26,6 +29,21 @@ class myHandler(SimpleHTTPRequestHandler):
 
 	#Handler for the GET requests
 	def do_GET(self):
+		print "received " + self.path
+		if self.path.endswith("get"):
+			self.send_response(200)
+			self.send_header('Content-type','text/html')
+			self.end_headers()
+			self.wfile.write(callUrl(CAMERA_CALLBACK_URL))
+			return
+
+		if self.path.startswith("/speak"):
+			self.send_response(200)
+			self.send_header('Content-type','text/html')
+			self.end_headers()
+			self.wfile.write(callUrl(SPEAK_CALLBACK_URL + self.path.split("?")[1]))
+			return
+
 		return SimpleHTTPRequestHandler.do_GET(self)
 
 	def do_POST(self):
