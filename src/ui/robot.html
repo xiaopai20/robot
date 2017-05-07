@@ -30,9 +30,9 @@ function replaceAll(str, find, replace) {
 }
 
 function speak(text) {
-   document.getElementById("speak").innerText=text;
-   w = new ActiveXObject("WScript.Shell");
-   w.run(speakerCommand + " \"" + text + "\"", 0, true);
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", "speak?" + text, true);
+  xmlhttp.send();
 }
 
 function searchImage(text) {
