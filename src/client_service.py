@@ -5,13 +5,21 @@ import cv2
 import urllib2
 import json
 import time
+import requests
+import pyttsx
+
 
 PORT_NUMBER = 8080
-IMG_PATH = "C:\\tf\\capture\\"
-SERVICE_URL_PARSE_IMG = "http://192.168.1.128:8080/parse"
+IMG_PATH = "C:\\robot\\capture\\"
+SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8080/parse"
 
 cap = cv2.VideoCapture(0)
 curImgIndex = 0
+
+engine = pyttsx.init()
+rate = engine.getProperty('rate')
+engine.setProperty('rate', rate - 20)
+engine.setProperty('voice', 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\TTS_MS_EN-US_ZIRA_11.0')
 
 def callUrl(url):
 	return urllib2.urlopen(url, timeout=1000).read()
@@ -20,12 +28,19 @@ def callUrl(url):
 #the browser
 class myHandler(SimpleHTTPRequestHandler):
 
+	def speak(self):
+		engine.say(self.path.split("?")[1])
+		engine.runAndWait()
+
 	#Handler for the GET requests
 	def do_GET(self):
-		startTime = time.time()
-		print "received " + self.path
+		if self.path.startswith("/speak"):
+			self.speak()
+
 		if not self.path.endswith("get"):
 			return SimpleHTTPRequestHandler.do_GET(self)
+		startTime = time.time()
+		print "received " + self.path
 
 		self.send_response(200)
 		self.send_header('cache-control','max-age=0')
@@ -54,7 +69,7 @@ class myHandler(SimpleHTTPRequestHandler):
 
 		file_ = {'file': open(imgFilePath, 'rb')}
 		r = requests.post(SERVICE_URL_PARSE_IMG, files=file_)
-
+		print r.text
 		self.wfile.write(r.text)
 
 try:

@@ -8,9 +8,10 @@ import cgi
 
 
 PORT_NUMBER = 8080
-IMG_PATH = "/Users/pguoping/tensorflow/share_data/"
-HUMAN_RECOGNIZE_SERVICE_URL = "http://localhost:8088/"
-BASIC_RECOGNIZE_SERVICE_URL = "http://localhost:8089/"
+# IMG_PATH = "/Users/pguoping/tensorflow/share_data/"
+IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data";
+HUMAN_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8088/"
+BASIC_RECOGNIZE_SERVICE_URL = "http://192.168.99.100:8089/"
 
 pool = ThreadPool(processes=2)
 curImgIndex = 0
