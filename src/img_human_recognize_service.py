@@ -1,12 +1,12 @@
 #!/usr/bin/python
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import tensorflow as tf, sys
 import time
 
 PORT_NUMBER = 8088
-IMAGE_ROOT = "/tf/share_data/"
-RETRAINED_TXT = "/tf/training/retrained_labels.txt"
-RETRAINED_GRAPH = "/tf/training/retrained_graph.pb"
+IMAGE_ROOT = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data\\"
+RETRAINED_TXT = "C:\\Users\\Hannah\\Desktop\\xiaopai\\training\\retrained_labels.txt"
+RETRAINED_GRAPH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\training\\retrained_graph.pb"
 
 # Loads label file, strips off carriage return
 label_lines = [line.rstrip() for line 
@@ -26,7 +26,7 @@ class myHandler(BaseHTTPRequestHandler):
 
     #Handler for the GET requests
     def do_GET(self):
-        print "receive: " + self.path
+        print("receive: " + self.path)
         startTime = time.time()
         if self.path.endswith(".ico"):
             return
@@ -46,22 +46,22 @@ class myHandler(BaseHTTPRequestHandler):
         for node_id in top_k:
            human_string = label_lines[node_id]
            score = predictions[0][node_id]
-           print '%s (score = %.5f)' % (human_string, score)
+           print('%s (score = %.5f)' % (human_string, score))
         if predictions[0][top_k[0]] > 0.5:
-           self.wfile.write(label_lines[top_k[0]])
+           self.wfile.write(label_lines[top_k[0]].encode())
 
-        print "delay: " + str(time.time() - startTime) + " " + label_lines[top_k[0]]
+        print("delay: " + str(time.time() - startTime) + " " + label_lines[top_k[0]])
 
 try:
     #Create a web server and define the handler to manage the
     #incoming request
     server = HTTPServer(('', PORT_NUMBER), myHandler)
-    print 'Started httpserver on port ' , PORT_NUMBER
+    print('Started httpserver on port ' , PORT_NUMBER)
 
     #Wait forever for incoming htto requests
     server.serve_forever()
 
 except KeyboardInterrupt:
-    print '^C received, shutting down the web server'
+    print('^C received, shutting down the web server')
     server.socket.close()
 

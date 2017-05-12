@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import tensorflow as tf
 import os.path
 import re
@@ -7,8 +7,8 @@ import json
 import time
 
 PORT_NUMBER = 8089
-IMAGE_ROOT = "/tf/share_data/"
-GRAPH_PATH = "/tf/training/"
+IMAGE_ROOT = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data\\"
+GRAPH_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\training\\"
 
 class NodeLookup(object):
   """Converts integer node ID's to human readable labels."""
@@ -90,7 +90,7 @@ class myHandler(BaseHTTPRequestHandler):
 
     #Handler for the GET requests
     def do_GET(self):
-        print "receive: " + self.path
+        print("receive: " + self.path)
         startTime = time.time()
         if self.path.endswith(".ico"):
             return
@@ -113,22 +113,22 @@ class myHandler(BaseHTTPRequestHandler):
            score = int(predictions[0][node_id] * 100)
            ret.append({"name" : human_string,
                "prediction" : score})
-        print ret
+        print(ret)
 
-        self.wfile.write(json.dumps(ret))
+        self.wfile.write(json.dumps(ret).encode())
 
-        print "delay: " + str(time.time() - startTime)
+        print("delay: " + str(time.time() - startTime))
 
 try:
     #Create a web server and define the handler to manage the
     #incoming request
     server = HTTPServer(('', PORT_NUMBER), myHandler)
-    print 'Started httpserver on port ' , PORT_NUMBER
+    print('Started httpserver on port ' , PORT_NUMBER)
 
     #Wait forever for incoming htto requests
     server.serve_forever()
 
 except KeyboardInterrupt:
-    print '^C received, shutting down the web server'
+    print('^C received, shutting down the web server')
     server.socket.close()
 
