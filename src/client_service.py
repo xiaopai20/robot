@@ -6,11 +6,12 @@ import urllib2
 import time
 import requests
 import pyttsx
+import json
 
 
 PORT_NUMBER = 8080
 # IMG_PATH = "C:\\robot\\capture\\"
-IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\tmp\\"
+IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\capture\\"
 SERVICE_URL_PARSE_IMG = "http://localhost:8081/parse"
 # SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8081/parse"
 
@@ -63,9 +64,10 @@ class myHandler(SimpleHTTPRequestHandler):
 		#cv2.imshow("input", img)
 		global curImgIndex
 		curImgIndex += 1
-		curImgIndex %= 100
+		curImgIndex %= 10
 
-		imgFilePath = IMG_PATH + str(curImgIndex) + ".jpg"
+		imgFileName = str(curImgIndex) + ".jpg"
+		imgFilePath = IMG_PATH + imgFileName
 		wRet = cv2.imwrite(imgFilePath, img)
 		if not wRet:
 			print "saving " + imgFilePath + " error"
@@ -73,8 +75,10 @@ class myHandler(SimpleHTTPRequestHandler):
 
 		file_ = {'file': open(imgFilePath, 'rb')}
 		r = requests.post(SERVICE_URL_PARSE_IMG, files=file_)
-		print r.text
-		self.wfile.write(r.text)
+		rObj = json.loads(r.text)
+		rObj["image"] = imgFileName
+		print rObj
+		self.wfile.write(json.dumps(rObj))
 
 try:
 	#Create a web server and define the handler to manage the

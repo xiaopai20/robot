@@ -123,7 +123,7 @@ function processResult(result) {
 
     var obj = JSON.parse(result);
 
-    document.getElementById("camera").src = "/share_data/" + obj.image + "?" + Math.random();
+    document.getElementById("camera").src = "/capture/" + obj.image + "?" + Math.random();
 
     if (nameMap[obj.person] == undefined) {
         processItem(obj.item);
