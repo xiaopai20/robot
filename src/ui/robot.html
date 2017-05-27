@@ -10,6 +10,7 @@ body {
     overflow:hidden;
     text-align: center;
 }
+
 </style>
 
 </header>
@@ -93,7 +94,6 @@ function processItem(itemStr) {
     var jsonHtml = JSON.stringify(obj, null, 2);
     jsonHtml = replaceAll(jsonHtml, "\n", "<BR>");
     jsonHtml = replaceAll(jsonHtml, " ", "&nbsp;");
-    document.getElementById("itemPrediction").innerHTML = jsonHtml;
 
     name = obj[0].name.split(",")[0];
     prediction = obj[0].prediction;
@@ -167,9 +167,8 @@ alert("start");
         <td width="300">
             <img id="robotImg" src="robotStand.png" width=300/>
         </td>
-        <td width="450" valign="bottom" align="left">
-            <font id="itemPrediction" color="#555555"
-                  style="display: inline-block; width:400px;"></font>
+        <td width="450" valign="top" align="left">
+            <iframe src="chatbot.html" width="300" height="360" frameBorder="0" scrolling="no"></iframe>
         </td>
     </tr>
 </table>

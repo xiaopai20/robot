@@ -1,34 +1,13 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 import sys
+import urllib.parse
 
-train_file = "data/legend_of_martial_arts/train.enc"
-dic_file = "working_dir_2/vocab20000.enc"
+t = u"这是一个句子"
+arr = [c for c in t]
+print(arr[0].encode('utf-8'))
+print(arr[2].encode('utf-8'))
 
-reload(sys).setdefaultencoding('utf-8')
-
-def chinese_tokenizer(sentence):
-  sentence = sentence.strip()
-  arr = list(unicode(sentence.decode('utf-8', errors='ignore').encode('utf-8')))
-  arr = [item.encode('utf-8') for item in arr]
-  return arr
-
-
-rev_vocab = []
-with open(dic_file, "rb") as f:
-  rev_vocab.extend(f.readlines())
-print(rev_vocab[10])
-rev_vocab = [(line.strip()) for line in rev_vocab]
-vocab = dict([(x, y) for (y, x) in enumerate(rev_vocab)])
-
-print(rev_vocab)
-
-test_str = ""
-with open(train_file, "rb") as f:
-  test_str = f.readlines()[0]
-
-print(test_str)
-array = chinese_tokenizer(test_str)
-print(array)
-print vocab["了"]
-print vocab[array[0]]
+text = "%E6%88%91%E9%9D%A0"
+text = urllib.parse.unquote(text)
+print("received: ".encode('utf-8') + text.encode('utf-8'))

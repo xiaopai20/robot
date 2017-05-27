@@ -13,6 +13,7 @@ PORT_NUMBER = 8080
 # IMG_PATH = "C:\\robot\\capture\\"
 IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\capture\\"
 SERVICE_URL_PARSE_IMG = "http://localhost:8081/parse"
+SERVICE_URL_CHAT = "http://127.0.0.1:8085/?"
 # SERVICE_URL_PARSE_IMG = "http://192.168.137.72:8081/parse"
 
 cap = cv2.VideoCapture(0)
@@ -36,10 +37,23 @@ class myHandler(SimpleHTTPRequestHandler):
 		engine.say(text)
 		engine.runAndWait()
 
+	def chat(self):
+		text = self.path.split("?")[1]
+		requestUrl = SERVICE_URL_CHAT + text
+		self.send_response(200)
+		self.send_header('Content-type','text/html; charset=utf-8')
+		self.end_headers()
+
+		self.wfile.write(callUrl(requestUrl))
+
 	#Handler for the GET requests
 	def do_GET(self):
 		if self.path.startswith("/speak"):
 			self.speak()
+			return
+
+		if self.path.startswith("/chat"):
+			self.chat()
 			return
 
 		if not self.path.endswith("get"):

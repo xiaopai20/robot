@@ -4,11 +4,9 @@ import urllib.request
 import json
 import time
 import cgi
-import requests
 
 
 PORT_NUMBER = 8081
-# IMG_PATH = "/Users/pguoping/tensorflow/share_data/"
 IMG_PATH = "C:\\Users\\Hannah\\Desktop\\xiaopai\\share_data\\"
 HUMAN_RECOGNIZE_SERVICE_URL = "http://127.0.0.1:8088/"
 BASIC_RECOGNIZE_SERVICE_URL = "http://127.0.0.1:8089/"
@@ -17,11 +15,7 @@ pool = ThreadPool(processes=2)
 curImgIndex = 0
 
 def callUrl(url):
-	# return urllib.request.urlopen(url, timeout=3000).read()
-	session = requests.Session()
-	session.trust_env = False
-
-	return session.get(url, stream=True).text
+	return urllib.request.urlopen(url, timeout=3000).read()
 
 #This class will handles any incoming request from
 #the browser
@@ -69,15 +63,12 @@ class myHandler(BaseHTTPRequestHandler):
 		# print("delay " + str(1000 * (time.time() - startTime)))
 		# item = itemAsyncCall.get(1000)
 
-		print("delay " + str(1000 * (time.time() - startTime)))
 		personName = callUrl(HUMAN_RECOGNIZE_SERVICE_URL + imgFileName)
-		print("delay " + str(1000 * (time.time() - startTime)))
 		item = callUrl(BASIC_RECOGNIZE_SERVICE_URL + imgFileName)
-		print("delay " + str(1000 * (time.time() - startTime)))
 
 		ret = {'image' : imgFileName,
-			   'person' : personName,
-			   'item' : item,
+			   'person' : personName.decode(),
+			   'item' : item.decode(),
 			   'delay' : int(1000 * (time.time() - startTime))}
 		print(ret)
 		self.wfile.write(json.dumps(ret).encode())

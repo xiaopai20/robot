@@ -232,8 +232,7 @@ def decode(tokenizer=None):
 
 def chinese_tokenizer(sentence):
   sentence = sentence.strip()
-  arr = list(unicode(sentence.decode('utf-8', errors='ignore').encode('utf-8')))
-  arr = [item.encode('utf-8') for item in arr]
+  arr = list(str(sentence.decode('utf-8', errors='ignore').encode('utf-8')))
   return arr
 
 if __name__ == '__main__':
